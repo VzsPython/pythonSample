@@ -46,7 +46,7 @@ mimedic = [
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
     # GET
     def do_GET(self):
-        sendReply = False
+        sendReply = True
         querypath = urlparse(self.path)
         print(querypath)
         # self.send_response(200)
@@ -55,27 +55,26 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         # self.wfile.write("ok")
         filepath, query = querypath.path, querypath.query
 
-        if filepath.endswith('/'):
-            filepath += 'index.html'
-        filename, fileext = path.splitext(filepath)
-        for e in mimedic:
-            if e[0] == fileext:
-                mimetype = e[1]
-                sendReply = True
-                break
+        # if filepath.endswith('/'):
+        #     filepath += 'index.html'
+        # filename, fileext = path.splitext(filepath)
+        # for e in mimedic:
+        #     if e[0] == fileext:
+        #         mimetype = e[1]
+        #         sendReply = True
+        #         break
 
         if sendReply == True:
             try:
                 content = "<html><body>ok</body></html>"
                 jsonObj = json.loads(getmockjson())
-                jsonNewObj = {
-                    'code' : 'RT000',
-                    'data' : jsonObj
-
-                }
+                jsonNewObj = dict(code='RT000',
+                                  data=jsonObj,
+                                  path=filepath,
+                                  query=query)
                 content = json.dumps(jsonNewObj)
                 self.send_response(200)
-                self.send_header('Content-type', mimetype)
+                self.send_header('Content-type', 'application/json')
                 self.end_headers()
                 self.wfile.write(content.encode())
                 # self.send_response(200, content.encode())
